@@ -33,37 +33,46 @@ class hash
 				s[i].d1.name[0]='\0';
 			}
 		}
-		int compute_pos(int key)		//chaining without replacement
+		int compute_pos(int key)		//chaining with replacement
 		{
-			int i=1;		//offset 
-			int h1=hash_fun(key);	//hash function
-			int h2=h1;		//moves to specific address
-			int h3=h1;		//moves to previous element with same hash value
-			int j=0;
-			while(s[h3].flag!=0)	//until empty location is identified
+			int h1,h2,h3,i,pos;
+			h1=h2=h3=hash_fun(key);
+			if(s[h2].flag==0)			//empty home location
+				return h2;
+			while(s[h3].flag!=0)
 			{
-				if(h1==((s[h3].d1.Roll_no)%13))		//if same hash value
+				h3=(h3+1)%13;		//holds the next free location
+			}	
+			if(hash_fun(s[h2].d1.Roll_no)==h1)		//same hash value
 				{
-					break;		//h3 now contains address of same hash value element
+					while(s[h2].chain!=-1)
+						h2=s[h2].chain;
+						
+					s[h2].chain=h3;
+					return h3;
 				}
-				h3=(h3+1)%13;
-				j++;
-			}
-			if(j==13)	
-				cout<<"Table full"<<endl;
-				
-				
-			while(s[h3].chain!=-1)		//access the chain to move to the end
-				h3=s[h3].chain;			
-			
-			while(s[h2].flag!=0)	//place for insertion
-				h2=(h2+i)%13;
+				else			//home location occupied by another
+				{
+					for(i=0;i<13;i++)		//element pointing to h2
+					{
+						if(s[i].chain==h2)	//i stores the index pointing to h2
+						{
+							pos=i;
+							break;
+						}
+						else
+							pos=-1;
 					
-			s[h3].chain=h2;		
-			return h2;
+					}
+					s[h3]=s[h2];
+					if(pos!=-1)			//if some element points to it
+						s[i].chain=h3;
+					return h2;
+				}
+			return h3;
 		}
 		
-	void search(int key)
+		void search(int key)
 		{
 			int h1= hash_fun(key);
 			int h2=h1,pos,flag1=0;
@@ -90,6 +99,7 @@ class hash
 				cout<<"Record Not Found in the hash table"<<endl;
 			}
 		}
+		
 		void accept()
 		{
 			int number,UID;
@@ -109,7 +119,7 @@ class hash
 				s[pos].flag=1;
 			}
 		}
-	void display()
+		void display()
 		{
 			int i;
 				cout<<"INDEX"<<"\t"<<"ROLL NO"<<"\t"<<"NAME"<<"\t"<<"CHAIN"<<endl;
@@ -155,8 +165,8 @@ int main()
 	return 0;
 }
 
-/*OUTPUT
-Enter your Choice
+/* OUTPUT
+	Enter your Choice
 1. Insert the data
 2. Display the data
 3. Search for a Record
@@ -226,16 +236,16 @@ INDEX   ROLL NO NAME    CHAIN
 0       57      JKL     -1
 1       58      KLM     -1
 2       41      BCD     -1
-3       23      LMN     -1
-4       77      MNO     -1
-5       18      ABC     6
-6       44      DEF     11
-7       45      EFG     10
-8       59      FGH     -1
+3       32      GHI     1
+4       44      DEF     11
+5       18      ABC     4
+6       45      EFG     3
+7       59      FGH     -1
+8       73      IJK     -1
 9       22      CDE     -1
-10      32      GHI     1
+10      23      LMN     -1
 11      31      HIJ     0
-12      73      IJK     -1
+12      77      MNO     -1
 Enter your Choice
 1. Insert the data
 2. Display the data
@@ -243,8 +253,8 @@ Enter your Choice
 4. QUIT
 3
 Enter the key to be searched
-18
-Record Found at position 5
+41
+Record Found at position 2
 Enter your Choice
 1. Insert the data
 2. Display the data
@@ -252,8 +262,8 @@ Enter your Choice
 4. QUIT
 3
 Enter the key to be searched
-31
-Record Found at position 11
+59
+Record Found at position 7
 Enter your Choice
 1. Insert the data
 2. Display the data
@@ -261,7 +271,25 @@ Enter your Choice
 4. QUIT
 3
 Enter the key to be searched
-05
+77
+Record Found at position 12
+Enter your Choice
+1. Insert the data
+2. Display the data
+3. Search for a Record
+4. QUIT
+3
+Enter the key to be searched
+73
+Record Found at position 8
+Enter your Choice
+1. Insert the data
+2. Display the data
+3. Search for a Record
+4. QUIT
+3
+Enter the key to be searched
+24
 Record Not Found in the hash table
 Enter your Choice
 1. Insert the data
@@ -269,4 +297,5 @@ Enter your Choice
 3. Search for a Record
 4. QUIT
 4
+Enter a valid choice
 */
